@@ -82,6 +82,35 @@ def generate_new_xid():
 
     return id
 
+def generate_machine_id(machine_str):
+    hw = hashlib.md5()
+    hw.update(machine_str.encode('utf-8'))
+    val = str(hw.digest()[:3])
+    return list(map(ord, val))
+
+def generate_deterministic_id(timestamp, machine_str, index):
+    # type: () -> List[int]
+    now = int(timestamp)
+    id_array = [0] * rawLen
+
+    id_array[0] = (now >> 24) & 0xff
+    id_array[1] = (now >> 16) & 0xff
+    id_array[2] = (now >> 8) & 0xff
+    id_array[3] = (now) & 0xff
+
+    machineID = generate_machine_id(machine_str)
+    id_array[4] = machineID[0]
+    id_array[5] = machineID[1]
+    id_array[6] = machineID[2]
+    id_array[7] = machineID[3]
+    id_array[8] = machineID[4]
+
+    id_array[9] = (index >> 16) & 0xff
+    id_array[10] = (index >> 8) & 0xff
+    id_array[11] = (index) & 0xff
+
+    byte_value = ''.join(map(chr, id_array))
+    return base32hex.b32encode(byte_value).lower()[:trimLen]
 
 
 class Xid(object):
@@ -122,7 +151,7 @@ class Xid(object):
 
     def bytes(self):
         # type: () -> str
-        return ''.join(map(chr, self.value))        
+        return ''.join(map(chr, self.value))
 
     def __repr__(self):
         return "<Xid '%s'>" % self.__str__()
