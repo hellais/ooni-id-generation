@@ -21,9 +21,11 @@ My proposal for implementing this is actually twofold:
 The gist of how this ID generation scheme works within the context of OONI Reports is that we basically are customizing the generating of an ID of the xid flavour (see: https://github.com/rs/xid).
 
 Instead of seeding the current time for the timestamp, we take the
-`measurement_start_time`, instead of using the machineID and process ID for the
-5 middle bytes, we use the `report_id`, instead of using a random 3-byte
-counter, we use the offset or index into a particular measurement.
+`measurement_start_time` and `bucket_date` (we use the day from the
+`bucket_date` and the time from the `measurement_start_time`), instead of using
+the machineID and process ID for the 5 middle bytes, we use the `report_id`,
+instead of using a random 3-byte counter, we use the offset or index into a
+particular measurement.
 
 The script `make-id.py` includes a full example of how you can use this within
 the context of the OONI Pipeline. In practice you can do
